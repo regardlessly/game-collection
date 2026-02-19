@@ -3,144 +3,409 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CaritaHub Games — Embed Integration Test</title>
+  <title>CaritaHub Games — Integration Test</title>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, sans-serif;
-      background: #0d1117;
-      color: #f0f6fc;
-      margin: 0;
+      background: #0a0a0f;
+      color: #e4e4e7;
       padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
+      min-height: 100vh;
     }
-    h1 { color: #e8b84b; margin: 0; }
+    h1 { color: #f59e0b; font-size: 1.4rem; }
+    .subtitle { color: #9ca3af; font-size: 0.875rem; line-height: 1.5; }
+
+    /* ── Controls ── */
     .controls {
+      background: #13131a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
       display: flex;
-      gap: 12px;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
       flex-wrap: wrap;
       align-items: center;
     }
-    select, input, button {
+    label { font-size: 0.8rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; min-width: 80px; }
+    select, input[type="text"] {
       height: 40px;
       padding: 0 12px;
-      border-radius: 8px;
-      border: 1px solid #4a5568;
-      background: #16213e;
-      color: #f7fafc;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #1a1a25;
+      color: #e4e4e7;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      flex: 1;
+      min-width: 140px;
+    }
+    select:focus, input[type="text"]:focus { border-color: #f59e0b; }
+    .env-toggle {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .env-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: transparent;
+      color: #9ca3af;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+    .env-btn.active {
+      background: rgba(245,158,11,0.15);
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+    .btn-primary {
+      height: 44px;
+      padding: 0 24px;
+      border-radius: 20px;
+      border: none;
+      background: #f59e0b;
+      color: #0a0a0f;
       font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 150ms ease;
+    }
+    .btn-primary:hover { background: #fbbf24; }
+    .btn-ghost {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: transparent;
+      color: #9ca3af;
+      font-size: 13px;
       font-family: inherit;
       cursor: pointer;
     }
-    button {
-      background: #e8b84b;
-      color: #1a1a2e;
-      font-weight: 700;
-      border: none;
-      padding: 0 20px;
+    .btn-ghost:hover { color: #e4e4e7; border-color: rgba(255,255,255,0.22); }
+
+    /* ── URL preview ── */
+    .url-preview {
+      background: #1a1a25;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #9ca3af;
+      word-break: break-all;
     }
-    button:hover { background: #f5d48a; }
+    .url-preview span { color: #f59e0b; }
+
+    /* ── iframe ── */
     iframe {
       width: 100%;
-      height: 700px;
-      border: 2px solid #4a5568;
-      border-radius: 12px;
-      background: #1a1a2e;
+      height: 680px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      background: #0a0a0f;
     }
+
+    /* ── Callback log ── */
+    .log-section { display: flex; flex-direction: column; gap: 8px; }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .log-title { font-size: 0.8rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+    .badge-waiting { background: rgba(156,163,175,0.1); color: #9ca3af; border: 1px solid rgba(156,163,175,0.2); }
+    .badge-received { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
     .log {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
+      background: #13131a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
       padding: 16px;
-      max-height: 300px;
+      max-height: 280px;
       overflow-y: auto;
       font-family: monospace;
       font-size: 13px;
     }
-    .log-entry { margin-bottom: 8px; color: #e8b84b; }
-    .log-entry pre {
-      color: #f0f6fc;
-      margin: 4px 0 0 0;
-      white-space: pre-wrap;
+    .log-empty { color: #4b5563; }
+    .log-entry {
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 12px;
     }
-    .label { color: #a0aec0; font-size: 14px; }
+    .log-entry:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+    .log-time { color: #f59e0b; font-size: 11px; margin-bottom: 4px; }
+    .log-label { color: #60a5fa; font-size: 12px; margin-bottom: 4px; }
+    .log-json { color: #e4e4e7; white-space: pre-wrap; line-height: 1.5; font-size: 12px; }
+    .log-error { color: #f87171; }
+
+    /* ── Result card ── */
+    .result-card {
+      display: none;
+      background: rgba(74,222,128,0.06);
+      border: 1px solid rgba(74,222,128,0.25);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+    .result-card.show { display: block; }
+    .result-card h3 { color: #4ade80; font-size: 0.95rem; margin-bottom: 10px; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .result-field { display: flex; flex-direction: column; gap: 2px; }
+    .result-key { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
+    .result-val { font-size: 14px; font-weight: 600; color: #e4e4e7; font-family: monospace; }
+    .result-val.green { color: #4ade80; }
+    .result-val.red { color: #f87171; }
+    .result-val.amber { color: #f59e0b; }
   </style>
 </head>
 <body>
-  <h1>CaritaHub Games — Embed Test</h1>
-  <p class="label">
-    This page tests iframe embedding + postMessage callback.
-    Open your browser console to see full logs.
-    A REST callback is sent to httpbin.org/post and echoed below.
-  </p>
 
-  <div class="controls">
-    <select id="gameSelect">
-      <option value="memory-match">Memory Match</option>
-      <option value="word-recall">Word Recall</option>
-      <option value="pattern-sequence">Pattern Sequence</option>
-      <option value="daily-arithmetic">Daily Arithmetic</option>
-      <option value="word-search">Word Search</option>
-    </select>
-    <select id="diffSelect">
-      <option value="easy">Easy</option>
-      <option value="medium">Medium</option>
-      <option value="hard">Hard</option>
-    </select>
-    <input id="memberInput" type="text" value="member-001" placeholder="Member ID" style="width:160px" />
-    <button onclick="loadGame()">Load Game</button>
-    <button onclick="clearLog()" style="background:#4a5568;color:#f7fafc">Clear Log</button>
+  <div>
+    <h1>CaritaHub Games — Integration Test</h1>
+    <p class="subtitle">
+      Simulates a host page passing <code>memberId</code> to the game via URL params.
+      Captures the <code>GAME_COMPLETE</code> postMessage callback and optionally fires a REST POST.
+    </p>
   </div>
 
+  <div class="controls">
+    <!-- Environment -->
+    <div class="row">
+      <label>Target</label>
+      <div class="env-toggle">
+        <button class="env-btn active" data-base="https://regardlessly.github.io/game-collection" onclick="setBase(this)">
+          Production
+        </button>
+        <button class="env-btn" data-base="http://localhost:5173" onclick="setBase(this)">
+          Local (5173)
+        </button>
+      </div>
+    </div>
+
+    <!-- Member ID -->
+    <div class="row">
+      <label>Member ID</label>
+      <input id="memberInput" type="text" value="member-001" placeholder="e.g. member-42" style="max-width:220px" oninput="updatePreview()" />
+    </div>
+
+    <!-- Game + Difficulty -->
+    <div class="row">
+      <label>Game</label>
+      <select id="gameSelect" onchange="updatePreview()">
+        <option value="memory-match">Memory Match</option>
+        <option value="word-recall">Word Recall</option>
+        <option value="pattern-sequence">Pattern Sequence</option>
+        <option value="daily-arithmetic">Daily Arithmetic</option>
+        <option value="word-search">Word Search</option>
+      </select>
+      <select id="diffSelect" onchange="updatePreview()">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
+    <!-- Callback URL -->
+    <div class="row">
+      <label>REST POST</label>
+      <input id="callbackInput" type="text" value="https://httpbin.org/post"
+        placeholder="Optional callback URL" style="flex:1" oninput="updatePreview()" />
+      <span style="color:#9ca3af;font-size:12px">(leave blank to skip)</span>
+    </div>
+
+    <!-- URL preview -->
+    <div class="url-preview" id="urlPreview">—</div>
+
+    <!-- Actions -->
+    <div class="row">
+      <button class="btn-primary" onclick="loadGame()">Launch Game</button>
+      <button class="btn-ghost" onclick="clearLog()">Clear Log</button>
+    </div>
+  </div>
+
+  <!-- Iframe -->
   <iframe id="gameFrame" title="CaritaHub Game" allow="autoplay"
     sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
 
-  <div>
-    <p class="label">📨 postMessage Events received from iframe:</p>
+  <!-- Latest result card -->
+  <div class="result-card" id="resultCard">
+    <h3>Latest Game Result</h3>
+    <div class="result-grid" id="resultGrid"></div>
+  </div>
+
+  <!-- Event log -->
+  <div class="log-section">
+    <div class="log-header">
+      <span class="log-title">Callback Log</span>
+      <span class="badge badge-waiting" id="statusBadge">Waiting</span>
+    </div>
     <div class="log" id="eventLog">
-      <span style="color:#4a5568">Waiting for game completion events…</span>
+      <span class="log-empty">Launch a game and complete it to see the callback payload here.</span>
     </div>
   </div>
 
   <script>
-    const DEV_BASE = 'http://localhost:5173';
-    const REST_ECHO = 'https://httpbin.org/post';
+    let currentBase = 'https://regardlessly.github.io/game-collection';
+    let callbackCount = 0;
 
-    function loadGame() {
-      const gameId = document.getElementById('gameSelect').value;
-      const difficulty = document.getElementById('diffSelect').value;
-      const memberId = document.getElementById('memberInput').value || 'anonymous';
-      const url = `${DEV_BASE}/?gameId=${gameId}&difficulty=${difficulty}&memberId=${memberId}&callbackUrl=${encodeURIComponent(REST_ECHO)}`;
-      document.getElementById('gameFrame').src = url;
-      logEntry(`Loaded: ${url}`);
+    function setBase(btn) {
+      currentBase = btn.dataset.base;
+      document.querySelectorAll('.env-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updatePreview();
     }
 
+    function buildUrl() {
+      const gameId    = document.getElementById('gameSelect').value;
+      const difficulty = document.getElementById('diffSelect').value;
+      const memberId  = document.getElementById('memberInput').value.trim() || 'anonymous';
+      const callbackUrl = document.getElementById('callbackInput').value.trim();
+      let url = `${currentBase}/?gameId=${encodeURIComponent(gameId)}&difficulty=${encodeURIComponent(difficulty)}&memberId=${encodeURIComponent(memberId)}`;
+      if (callbackUrl) url += `&callbackUrl=${encodeURIComponent(callbackUrl)}`;
+      return url;
+    }
+
+    function updatePreview() {
+      const url = buildUrl();
+      const display = url.replace(/([?&])/g, '<wbr>$1');
+      document.getElementById('urlPreview').innerHTML = `<span>GET</span> ${display}`;
+    }
+
+    function loadGame() {
+      const url = buildUrl();
+      document.getElementById('gameFrame').src = url;
+      logEntry('system', `Game loaded → ${url}`);
+    }
+
+    // ── postMessage listener ───────────────────────────────────────
     window.addEventListener('message', async (event) => {
-      // In production, validate event.origin against your domain
       if (!event.data || event.data.type !== 'GAME_COMPLETE') return;
       const { payload } = event.data;
+      callbackCount++;
+
       console.log('[GAME_COMPLETE postMessage]', payload);
-      logEntry('postMessage received', payload);
+
+      // Update status badge
+      const badge = document.getElementById('statusBadge');
+      badge.textContent = `${callbackCount} received`;
+      badge.className = 'badge badge-received';
+
+      // Show result card
+      showResultCard(payload);
+
+      // Log postMessage
+      logEntry('postMessage', payload);
+
+      // Optional REST POST echo
+      const callbackUrl = document.getElementById('callbackInput').value.trim();
+      if (callbackUrl) {
+        logEntry('rest-pending', `POSTing to ${callbackUrl}…`);
+        try {
+          const res = await fetch(callbackUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const echo = await res.json();
+          // httpbin echoes back under .json; other endpoints may differ
+          logEntry('rest-ok', echo.json ?? echo, `HTTP ${res.status}`);
+        } catch (err) {
+          logEntry('rest-error', null, `Fetch failed: ${err.message}`);
+        }
+      }
     });
 
-    function logEntry(label, data) {
+    // ── Log helpers ────────────────────────────────────────────────
+    function logEntry(type, data, extra) {
       const log = document.getElementById('eventLog');
+      // Remove placeholder
+      const empty = log.querySelector('.log-empty');
+      if (empty) empty.remove();
+
       const entry = document.createElement('div');
       entry.className = 'log-entry';
-      entry.innerHTML = `<strong>${new Date().toLocaleTimeString()} — ${label}</strong>${
-        data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''
-      }`;
+      const time = new Date().toLocaleTimeString();
+
+      const labels = {
+        'system':       '🔄 System',
+        'postMessage':  '📨 postMessage — GAME_COMPLETE',
+        'rest-pending': '🌐 REST POST (pending)',
+        'rest-ok':      '✅ REST POST — response echoed',
+        'rest-error':   '❌ REST POST — error',
+      };
+      const label = labels[type] ?? type;
+      const isError = type === 'rest-error';
+
+      entry.innerHTML = `
+        <div class="log-time">${time}</div>
+        <div class="log-label ${isError ? 'log-error' : ''}">${label}${extra ? ` — ${extra}` : ''}</div>
+        ${data !== null && data !== undefined
+          ? `<div class="log-json">${JSON.stringify(data, null, 2)}</div>`
+          : ''}
+      `;
       log.prepend(entry);
     }
 
     function clearLog() {
       document.getElementById('eventLog').innerHTML =
-        '<span style="color:#4a5568">Log cleared.</span>';
+        '<span class="log-empty">Log cleared.</span>';
+      document.getElementById('statusBadge').textContent = 'Waiting';
+      document.getElementById('statusBadge').className = 'badge badge-waiting';
+      document.getElementById('resultCard').classList.remove('show');
+      callbackCount = 0;
     }
 
-    // Auto-load on page open
-    loadGame();
+    function showResultCard(payload) {
+      const card = document.getElementById('resultCard');
+      const grid = document.getElementById('resultGrid');
+      card.classList.add('show');
+
+      const pct = payload.maxScore > 0
+        ? Math.round((payload.score / payload.maxScore) * 100)
+        : null;
+
+      const fields = [
+        { key: 'Member ID',  val: payload.memberId, cls: 'amber' },
+        { key: 'Game',       val: payload.gameId },
+        { key: 'Score',      val: `${payload.score} / ${payload.maxScore}` },
+        { key: 'Percentage', val: pct !== null ? `${pct}%` : '—', cls: pct >= 70 ? 'green' : pct >= 40 ? '' : 'red' },
+        { key: 'Completed',  val: payload.completed ? 'Yes' : 'No (timeout)', cls: payload.completed ? 'green' : 'red' },
+        { key: 'Duration',   val: `${payload.durationSeconds}s` },
+        { key: 'Difficulty', val: payload.difficulty ?? '—' },
+        { key: 'Timestamp',  val: new Date(payload.timestamp).toLocaleTimeString() },
+      ];
+
+      grid.innerHTML = fields.map(f => `
+        <div class="result-field">
+          <span class="result-key">${f.key}</span>
+          <span class="result-val ${f.cls ?? ''}">${f.val}</span>
+        </div>
+      `).join('');
+    }
+
+    // Init
+    updatePreview();
   </script>
 </body>
 </html>
