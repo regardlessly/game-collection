@@ -184,8 +184,7 @@ function FlagQuizGame({ difficulty, onComplete, reportScore, secondsLeft }) {
               onClick={() => handleChoice(opt)}
               disabled={!!feedback}
             >
-              <span className={styles.optFlag} aria-hidden="true">{flag(opt.code)}</span>
-              {opt.name}
+                {opt.name}
             </button>
           );
         })}
