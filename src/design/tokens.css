@@ -1,74 +1,95 @@
 :root {
-  /* Typography */
-  --font-base: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --text-xs: 0.75rem;     /* 12px — labels */
-  --text-sm: 1rem;        /* 16px — secondary text */
-  --text-md: 1.125rem;    /* 18px — default body */
-  --text-lg: 1.375rem;    /* 22px — section headings */
-  --text-xl: 1.75rem;     /* 28px — page headings */
-  --text-game: 2.5rem;    /* 40px — numbers/tiles in games */
+  /* ── Typography ─────────────────────────────────────────────────
+     Brand: Helvetica Neue / Helvetica / Arial (system sans-serif)
+     H1 Headline:  Helvetica Bold 30pt  → 2.5rem  (40px) bold
+     Slide Title:  Helvetica Bold 20pt  → 1.667rem (26.7px) bold
+     H2 Subhead:   Helvetica Bold 14pt  → 1.167rem (18.7px) bold
+     Body Text:    Helvetica Light 14pt → 1.167rem (18.7px) 300
+     Smaller Text: Helvetica Light 10pt → 0.833rem (13.3px) 300
+  ──────────────────────────────────────────────────────────────── */
+  --font-base:    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-heading: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
-  /* Dark palette matching storybook-collection */
-  --color-bg: #0a0a0f;
-  --color-surface: #13131a;
-  --color-surface-2: #1a1a25;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-hover: rgba(255, 255, 255, 0.18);
-  --color-primary: #f59e0b;       /* Warm amber — matches storybook accent-warm */
-  --color-primary-dk: #d97706;
-  --color-primary-light: #fbbf24;
-  --color-accent: #60a5fa;        /* Cool blue — matches storybook accent-cool */
-  --color-success: #4ade80;
-  --color-success-bg: rgba(74, 222, 128, 0.1);
-  --color-error: #f87171;
-  --color-error-bg: rgba(248, 113, 113, 0.1);
-  --color-warning: #fbbf24;
-  --color-text: #e4e4e7;
-  --color-text-muted: #9ca3af;
-  --color-focus: #60a5fa;
-  --color-card-back: #1a1a25;
-  --color-card-front: #f7fafc;
+  --text-xs:      0.833rem;   /* 13.3px — Smaller Text (10pt) */
+  --text-sm:      1.167rem;   /* 18.7px — Body / H2 base (14pt) */
+  --text-md:      1.167rem;   /* 18.7px — Body Text (14pt) */
+  --text-lg:      1.667rem;   /* 26.7px — Slide Title (20pt) */
+  --text-xl:      2.5rem;     /* 40px   — H1 Headline (30pt) */
+  --text-game:    2.5rem;     /* 40px   — numbers/tiles in games */
 
-  /* Pad colors for Pattern Sequence */
-  --color-pad-red: #ef4444;
-  --color-pad-blue: #3b82f6;
-  --color-pad-yellow: #eab308;
-  --color-pad-green: #22c55e;
-  --color-pad-red-lit: #fca5a5;
-  --color-pad-blue-lit: #93c5fd;
+  --font-weight-light:  300;
+  --font-weight-regular: 400;
+  --font-weight-bold:   700;
+
+  /* ── Brand Color Palette ────────────────────────────────────────
+     #1155cc  Primary Blue
+     #cfe2f3  Secondary Light Blue
+     #efefef  Secondary Light Gray
+     #000000  Text Black
+     #ffffff  Background White
+  ──────────────────────────────────────────────────────────────── */
+  --color-bg:           #ffffff;          /* Background White */
+  --color-surface:      #ffffff;          /* Card background */
+  --color-surface-2:    #efefef;          /* Secondary Light Gray — section bg */
+  --color-border:       #e0e0e0;          /* Subtle border on white bg */
+  --color-border-hover: #1155cc;          /* Primary Blue on hover */
+  --color-primary:      #1155cc;          /* Primary Blue */
+  --color-primary-dk:   #0d44a8;          /* Darker Blue — pressed state */
+  --color-primary-light:#cfe2f3;          /* Secondary Light Blue — hover bg */
+
+  --color-accent:       #1155cc;          /* Use Primary Blue per brand */
+  --color-success:      #1e7e34;
+  --color-success-bg:   rgba(30, 126, 52, 0.08);
+  --color-error:        #c0392b;
+  --color-error-bg:     rgba(192, 57, 43, 0.08);
+  --color-warning:      #e67e22;
+
+  --color-text:         #000000;          /* Text Black */
+  --color-text-muted:   #555555;          /* Softer black for secondary text */
+  --color-focus:        #1155cc;          /* Primary Blue for focus rings */
+  --color-card-back:    #efefef;
+  --color-card-front:   #ffffff;
+
+  /* ── Pad colors for Pattern Sequence (keep vivid for gameplay) ── */
+  --color-pad-red:        #ef4444;
+  --color-pad-blue:       #1155cc;
+  --color-pad-yellow:     #eab308;
+  --color-pad-green:      #22c55e;
+  --color-pad-red-lit:    #fca5a5;
+  --color-pad-blue-lit:   #cfe2f3;
   --color-pad-yellow-lit: #fde047;
-  --color-pad-green-lit: #86efac;
+  --color-pad-green-lit:  #86efac;
 
-  /* Spacing scale */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
+  /* ── Spacing scale ────────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
   --space-10: 40px;
   --space-12: 48px;
+  --color-surface-card: #efefef;   /* Light gray card bg per brand */
   --space-16: 64px;
 
-  /* Interactive targets */
+  /* ── Interactive targets ──────────────────────────────────────── */
   --min-target: 48px;
 
-  /* Borders — rounder to match storybook */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;   /* matches storybook card radius */
+  /* ── Borders — rounded rectangles per brand ──────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   16px;   /* card radius per brand */
   --radius-full: 999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.6);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7);
-  --shadow-glow: 0 0 20px rgba(245, 158, 11, 0.15);
+  /* ── Shadows — light theme, subtle ───────────────────────────── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.10);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
+  --shadow-glow: 0 0 20px rgba(17, 85, 204, 0.18);
 
-  /* Motion */
+  /* ── Motion ───────────────────────────────────────────────────── */
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
   --transition-flip: 500ms ease;
