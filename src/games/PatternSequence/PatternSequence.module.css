@@ -1,0 +1,94 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-4) 0;
+}
+
+.statusText {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  min-height: 1.8em;
+  text-align: center;
+  font-weight: 500;
+}
+
+.roundInfo {
+  font-size: var(--text-md);
+  color: var(--color-text-muted);
+}
+
+.roundInfo strong {
+  color: var(--color-primary);
+}
+
+/* 2x2 pad grid */
+.padGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.pad {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-xl);
+  border: 3px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: opacity var(--transition-fast), transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+@media (max-width: 400px) {
+  .pad {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+.pad:disabled {
+  cursor: default;
+}
+
+.pad:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.pad:not(:disabled):hover {
+  opacity: 0.85;
+  transform: scale(1.04);
+}
+
+.pad:not(:disabled):active {
+  transform: scale(0.96);
+}
+
+/* Pad colors */
+.padRed    { background-color: var(--color-pad-red);    }
+.padBlue   { background-color: var(--color-pad-blue);   }
+.padYellow { background-color: var(--color-pad-yellow); }
+.padGreen  { background-color: var(--color-pad-green);  }
+
+/* Lit state */
+.padLit.padRed    { background-color: var(--color-pad-red-lit);    box-shadow: 0 0 32px var(--color-pad-red-lit); }
+.padLit.padBlue   { background-color: var(--color-pad-blue-lit);   box-shadow: 0 0 32px var(--color-pad-blue-lit); }
+.padLit.padYellow { background-color: var(--color-pad-yellow-lit); box-shadow: 0 0 32px var(--color-pad-yellow-lit); }
+.padLit.padGreen  { background-color: var(--color-pad-green-lit);  box-shadow: 0 0 32px var(--color-pad-green-lit); }
+
+.failedOverlay {
+  background-color: var(--color-error-bg);
+  border: 2px solid var(--color-error);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-8);
+  color: var(--color-error);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  text-align: center;
+}

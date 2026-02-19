@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CaritaHub Games — Embed Integration Test</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0d1117;
+      color: #f0f6fc;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    h1 { color: #e8b84b; margin: 0; }
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    select, input, button {
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid #4a5568;
+      background: #16213e;
+      color: #f7fafc;
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    button {
+      background: #e8b84b;
+      color: #1a1a2e;
+      font-weight: 700;
+      border: none;
+      padding: 0 20px;
+    }
+    button:hover { background: #f5d48a; }
+    iframe {
+      width: 100%;
+      height: 700px;
+      border: 2px solid #4a5568;
+      border-radius: 12px;
+      background: #1a1a2e;
+    }
+    .log {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .log-entry { margin-bottom: 8px; color: #e8b84b; }
+    .log-entry pre {
+      color: #f0f6fc;
+      margin: 4px 0 0 0;
+      white-space: pre-wrap;
+    }
+    .label { color: #a0aec0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>CaritaHub Games — Embed Test</h1>
+  <p class="label">
+    This page tests iframe embedding + postMessage callback.
+    Open your browser console to see full logs.
+    A REST callback is sent to httpbin.org/post and echoed below.
+  </p>
+
+  <div class="controls">
+    <select id="gameSelect">
+      <option value="memory-match">Memory Match</option>
+      <option value="word-recall">Word Recall</option>
+      <option value="pattern-sequence">Pattern Sequence</option>
+      <option value="daily-arithmetic">Daily Arithmetic</option>
+      <option value="word-search">Word Search</option>
+    </select>
+    <select id="diffSelect">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+    <input id="memberInput" type="text" value="member-001" placeholder="Member ID" style="width:160px" />
+    <button onclick="loadGame()">Load Game</button>
+    <button onclick="clearLog()" style="background:#4a5568;color:#f7fafc">Clear Log</button>
+  </div>
+
+  <iframe id="gameFrame" title="CaritaHub Game" allow="autoplay"
+    sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+
+  <div>
+    <p class="label">📨 postMessage Events received from iframe:</p>
+    <div class="log" id="eventLog">
+      <span style="color:#4a5568">Waiting for game completion events…</span>
+    </div>
+  </div>
+
+  <script>
+    const DEV_BASE = 'http://localhost:5173';
+    const REST_ECHO = 'https://httpbin.org/post';
+
+    function loadGame() {
+      const gameId = document.getElementById('gameSelect').value;
+      const difficulty = document.getElementById('diffSelect').value;
+      const memberId = document.getElementById('memberInput').value || 'anonymous';
+      const url = `${DEV_BASE}/?gameId=${gameId}&difficulty=${difficulty}&memberId=${memberId}&callbackUrl=${encodeURIComponent(REST_ECHO)}`;
+      document.getElementById('gameFrame').src = url;
+      logEntry(`Loaded: ${url}`);
+    }
+
+    window.addEventListener('message', async (event) => {
+      // In production, validate event.origin against your domain
+      if (!event.data || event.data.type !== 'GAME_COMPLETE') return;
+      const { payload } = event.data;
+      console.log('[GAME_COMPLETE postMessage]', payload);
+      logEntry('postMessage received', payload);
+    });
+
+    function logEntry(label, data) {
+      const log = document.getElementById('eventLog');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<strong>${new Date().toLocaleTimeString()} — ${label}</strong>${
+        data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''
+      }`;
+      log.prepend(entry);
+    }
+
+    function clearLog() {
+      document.getElementById('eventLog').innerHTML =
+        '<span style="color:#4a5568">Log cleared.</span>';
+    }
+
+    // Auto-load on page open
+    loadGame();
+  </script>
+</body>
+</html>

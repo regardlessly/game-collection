@@ -1,0 +1,120 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  width: 100%;
+}
+
+/* Word list above grid on all screens (simpler on mobile) */
+.wordChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  width: 100%;
+}
+
+.wordChip {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 0.08em;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.wordChip.wordFound {
+  color: var(--color-success);
+  background-color: var(--color-success-bg);
+  border-color: var(--color-success);
+  text-decoration: line-through;
+}
+
+.wordChip.wordPending {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+/* ── Grid — fluid cell sizing ─────────────────── */
+.grid {
+  display: grid;
+  gap: 2px;
+  user-select: none;
+  width: 100%;
+  /* Grid fills available width; cells are squares via aspect-ratio */
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.cell {
+  /* Width driven by the grid column; height from aspect-ratio */
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: clamp(0.65rem, 2.5vw, var(--text-sm));
+  font-weight: 700;
+  font-family: var(--font-base);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.cell:hover { background-color: var(--color-surface-2); }
+
+.cell.selected {
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  border-color: var(--color-primary);
+}
+
+.cell.found {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.cell.start { box-shadow: 0 0 0 2px var(--color-focus); }
+
+.cell:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 1px; }
+
+/* ── Status bar ───────────────────────────────── */
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.statusText {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  min-height: 1.4em;
+  font-weight: 500;
+}
+
+.statusFound  { color: var(--color-success); }
+.statusMiss   { color: var(--color-error); }
+
+.scoreCount {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.scoreCount strong { color: var(--color-primary); }
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  font-style: italic;
+}

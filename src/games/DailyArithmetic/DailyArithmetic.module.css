@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-4) 0;
+  width: 100%;
+}
+
+.progress {
+  width: 100%;
+}
+
+.questionCard {
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.questionText {
+  font-size: clamp(1.8rem, 8vw, var(--text-game));
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.inputRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.numberInput {
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  background-color: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-family: var(--font-base);
+  padding: 0 var(--space-4);
+  text-align: center;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  /* Remove browser spinner arrows */
+  -moz-appearance: textfield;
+}
+.numberInput::-webkit-inner-spin-button,
+.numberInput::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.numberInput:focus { border-color: var(--color-focus); }
+.numberInput.correct { border-color: var(--color-success); background-color: var(--color-success-bg); }
+.numberInput.wrong   { border-color: var(--color-error);   background-color: var(--color-error-bg); }
+
+.feedbackIcon {
+  font-size: var(--text-xl);
+  min-width: 32px;
+  text-align: center;
+}
+
+.scoreDisplay { font-size: var(--text-md); color: var(--color-text-muted); }
+.scoreDisplay strong { color: var(--color-primary); }

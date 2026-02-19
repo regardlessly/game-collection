@@ -1,0 +1,77 @@
+:root {
+  /* Typography — minimum 18px everywhere */
+  --font-base: 'Inter', system-ui, sans-serif;
+  --text-xs: 1rem;        /* 16px — decorative labels only */
+  --text-sm: 1.125rem;    /* 18px — minimum body text */
+  --text-md: 1.25rem;     /* 20px — default body */
+  --text-lg: 1.5rem;      /* 24px — section headings */
+  --text-xl: 2rem;        /* 32px — page headings */
+  --text-game: 2.5rem;    /* 40px — numbers/tiles in games */
+
+  /* High-contrast dark palette (WCAG AA throughout) */
+  --color-bg: #1a1a2e;          /* Deep navy — reduces glare vs pure black */
+  --color-surface: #16213e;
+  --color-surface-2: #0f3460;
+  --color-border: #4a5568;
+  --color-primary: #e8b84b;     /* Warm gold — 7.2:1 contrast on bg */
+  --color-primary-dk: #c99a2e;
+  --color-primary-light: #f5d48a;
+  --color-success: #48bb78;     /* Green — 5.1:1 on bg */
+  --color-success-bg: #1c4532;
+  --color-error: #fc8181;       /* Soft red — 4.8:1 on bg */
+  --color-error-bg: #4a1414;
+  --color-warning: #f6ad55;
+  --color-text: #f7fafc;        /* Near-white */
+  --color-text-muted: #a0aec0;
+  --color-focus: #63b3ed;       /* Sky blue focus ring */
+  --color-card-back: #0f3460;
+  --color-card-front: #f7fafc;
+
+  /* Pad colors for Pattern Sequence */
+  --color-pad-red: #e53e3e;
+  --color-pad-blue: #3182ce;
+  --color-pad-yellow: #d69e2e;
+  --color-pad-green: #38a169;
+  --color-pad-red-lit: #fc8181;
+  --color-pad-blue-lit: #63b3ed;
+  --color-pad-yellow-lit: #f6e05e;
+  --color-pad-green-lit: #68d391;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Interactive targets */
+  --min-target: 48px;   /* WCAG 2.5.5 AA minimum tap target */
+
+  /* Borders */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+  /* Motion */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-flip: 600ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-base: 0ms;
+    --transition-flip: 0ms;
+  }
+}

@@ -1,0 +1,167 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── In-flow back button (start/end screens) ─── */
+.backBtn {
+  align-self: flex-start;
+  margin-bottom: var(--space-4);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-family: var(--font-base);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+.backBtn:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+
+/* ── Start Screen ─────────────────────────────── */
+.startScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: var(--space-6);
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+
+.gameTitle {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.difficultyBadge {
+  display: inline-block;
+  padding: var(--space-2) var(--space-6);
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badgeEasy  { background-color: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success); }
+.badgeMedium{ background-color: rgba(246,173,85,0.15);   color: var(--color-warning); border: 1px solid var(--color-warning); }
+.badgeHard  { background-color: var(--color-error-bg);   color: var(--color-error);   border: 1px solid var(--color-error); }
+
+.instructions {
+  width: 100%;
+  max-width: 520px;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.7;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  text-align: left;
+}
+.instructionsTitle {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+/* ── HUD ──────────────────────────────────────── */
+.hud {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+
+.hudBack {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+  font-family: var(--font-base);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+.hudBack:hover { color: var(--color-text); border-color: var(--color-text-muted); }
+
+.hudScore { flex: 1; font-size: var(--text-md); font-weight: 700; color: var(--color-primary); }
+.hudScoreLabel { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 400; }
+
+.hudTimer { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+.hudTimerLabel { font-size: var(--text-sm); color: var(--color-text-muted); }
+.hudTimerValue { font-size: var(--text-md); font-weight: 700; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
+.hudTimerUrgent { color: var(--color-error); }
+.hudTimerNormal { color: var(--color-text); }
+
+.gameBody { flex: 1; display: flex; flex-direction: column; }
+
+/* ── End Screen ───────────────────────────────── */
+.endScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: var(--space-6);
+  text-align: center;
+  padding: var(--space-4) 0;
+}
+
+.endHeadline { font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; color: var(--color-primary); }
+
+.endScoreCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 320px;
+}
+
+.endScoreValue { font-size: clamp(2.5rem, 10vw, 3.5rem); font-weight: 700; color: var(--color-primary); line-height: 1; }
+.endScoreMax   { font-size: var(--text-md); color: var(--color-text-muted); }
+.endDuration   { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+.endButtonGroup {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+}
+.endButtonGroup > * { flex: 1; min-width: 130px; }
+
+.timedOutBadge {
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
