@@ -1,0 +1,141 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Status row (lives + score) ───────────────────── */
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  padding: 0 var(--space-2);
+}
+
+.livesRow {
+  display: flex;
+  gap: 4px;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.heartFull  { opacity: 1; }
+.heartEmpty { opacity: 0.3; }
+
+.scoreDisplay {
+  font-size: var(--text-md);
+  color: var(--color-text-muted);
+}
+.scoreDisplay strong {
+  color: var(--color-primary);
+  font-size: var(--text-lg);
+}
+
+/* ── Game area ────────────────────────────────────── */
+.gameArea {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 420px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  touch-action: none;   /* prevent scroll while playing */
+  cursor: none;         /* hide cursor — fruit/basket is enough feedback */
+
+  /* Sky gradient background */
+  background:
+    radial-gradient(ellipse 60% 40% at 25% 30%, rgba(96, 165, 250, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 75% 20%, rgba(96, 165, 250, 0.08) 0%, transparent 70%),
+    linear-gradient(180deg, #0d1b2e 0%, #0f2340 40%, #132a1e 100%);
+}
+
+/* Subtle ground strip */
+.gameArea::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: linear-gradient(180deg, transparent, rgba(74, 222, 128, 0.08));
+  border-top: 1px solid rgba(74, 222, 128, 0.12);
+  pointer-events: none;
+}
+
+/* ── Fruit ────────────────────────────────────────── */
+.fruit {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  font-size: 1.8rem;
+  line-height: 40px;
+  text-align: center;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  will-change: transform, top;
+}
+
+/* ── Basket ───────────────────────────────────────── */
+.basket {
+  position: absolute;
+  bottom: 12px;
+  height: 44px;
+  font-size: 2.2rem;
+  line-height: 44px;
+  text-align: center;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  transition: left 40ms linear;
+  will-change: left;
+}
+
+/* ── Tap zones (senior-friendly side buttons) ─────── */
+.tapZone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 52px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.18);
+  font-size: 2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  z-index: 2;
+}
+.tapZone:hover,
+.tapZone:active {
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+}
+.tapZoneLeft  { left: 0;  border-radius: var(--radius-xl) 0 0 var(--radius-xl); }
+.tapZoneRight { right: 0; border-radius: 0 var(--radius-xl) var(--radius-xl) 0; }
+
+/* ── Hint text ────────────────────────────────────── */
+.hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* ── Responsive: shorter game area on small screens ─ */
+@media (max-height: 680px) {
+  .gameArea { height: 320px; }
+}
+@media (max-width: 380px) {
+  .gameArea { height: 340px; }
+  .tapZone  { width: 44px; }
+}

@@ -4,6 +4,7 @@ import { WordRecall } from './games/WordRecall/WordRecall';
 import { PatternSequence } from './games/PatternSequence/PatternSequence';
 import { DailyArithmetic } from './games/DailyArithmetic/DailyArithmetic';
 import { WordSearch } from './games/WordSearch/WordSearch';
+import { CatchFallingFruit } from './games/CatchFallingFruit/CatchFallingFruit';
 import { useMusic } from './hooks/useMusic';
 import './design/globals.css';
 import styles from './App.module.css';
@@ -16,6 +17,7 @@ const GAME_MAP = {
   'pattern-sequence': PatternSequence,
   'daily-arithmetic': DailyArithmetic,
   'word-search': WordSearch,
+  'catch-falling-fruit': CatchFallingFruit,
 };
 
 const GAME_INFO = [
@@ -53,6 +55,13 @@ const GAME_INFO = [
     description: 'Find hidden words in a letter grid. Exercises visual scanning and vocabulary.',
     icon: '🔍',
     domain: 'Visual Scanning',
+  },
+  {
+    id: 'catch-falling-fruit',
+    title: 'Catch the Falling Fruit',
+    description: 'Move the basket to catch falling fruit before it hits the ground. Exercises reflexes and coordination.',
+    icon: '🧺',
+    domain: 'Coordination',
   },
 ];
 
