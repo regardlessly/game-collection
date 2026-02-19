@@ -5,6 +5,9 @@ import { PatternSequence } from './games/PatternSequence/PatternSequence';
 import { DailyArithmetic } from './games/DailyArithmetic/DailyArithmetic';
 import { WordSearch } from './games/WordSearch/WordSearch';
 import { CatchFallingFruit } from './games/CatchFallingFruit/CatchFallingFruit';
+import { RightTime } from './games/RightTime/RightTime';
+import { BalloonPop } from './games/BalloonPop/BalloonPop';
+import { FlagQuiz } from './games/FlagQuiz/FlagQuiz';
 import { useMusic } from './hooks/useMusic';
 import './design/globals.css';
 import styles from './App.module.css';
@@ -18,6 +21,9 @@ const GAME_MAP = {
   'daily-arithmetic': DailyArithmetic,
   'word-search': WordSearch,
   'catch-falling-fruit': CatchFallingFruit,
+  'right-time': RightTime,
+  'balloon-pop': BalloonPop,
+  'flag-quiz': FlagQuiz,
 };
 
 const GAME_INFO = [
@@ -62,6 +68,27 @@ const GAME_INFO = [
     description: 'Move the basket to catch falling fruit before it hits the ground. Exercises reflexes and coordination.',
     icon: '🧺',
     domain: 'Coordination',
+  },
+  {
+    id: 'right-time',
+    title: 'Right Time',
+    description: 'Read the analog clock and choose the correct time. Exercises visual cognition and time-telling.',
+    icon: '🕐',
+    domain: 'Visual Cognition',
+  },
+  {
+    id: 'balloon-pop',
+    title: 'Balloon Pop',
+    description: 'Tap the balloons before they float away! Exercises attention and reaction speed.',
+    icon: '🎈',
+    domain: 'Reaction Speed',
+  },
+  {
+    id: 'flag-quiz',
+    title: 'Flag Quiz',
+    description: 'Identify countries by their flags. Exercises general knowledge and visual recognition.',
+    icon: '🏳️',
+    domain: 'General Knowledge',
   },
 ];
 

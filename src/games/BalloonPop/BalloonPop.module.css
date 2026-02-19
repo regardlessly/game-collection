@@ -1,0 +1,88 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Status ───────────────────────────────────────── */
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  padding: 0 var(--space-2);
+}
+
+.livesRow { display: flex; gap: 4px; font-size: 1.4rem; line-height: 1; }
+.heartFull  { opacity: 1; }
+.heartEmpty { opacity: 0.3; }
+
+.scoreDisplay { font-size: var(--text-md); color: var(--color-text-muted); }
+.scoreDisplay strong { color: var(--color-primary); font-size: var(--text-lg); }
+
+/* ── Game area ────────────────────────────────────── */
+.gameArea {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 420px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(96,165,250,0.08) 0%, transparent 70%),
+    linear-gradient(180deg, #0a1628 0%, #0d1b2e 60%, #0a1628 100%);
+}
+
+/* ── Balloon button ───────────────────────────────── */
+.balloon {
+  position: absolute;
+  width: 52px;
+  height: 64px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  transition: transform 80ms ease;
+  will-change: top, left;
+  touch-action: none;
+}
+.balloon:active { transform: scale(0.85); }
+
+/* ── Pop burst ────────────────────────────────────── */
+.popBurst {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  margin-left: -30px;
+  margin-top: -30px;
+  border-radius: 50%;
+  background: var(--bcolor, #f87171);
+  opacity: 0;
+  animation: burst 0.4s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes burst {
+  0%   { transform: scale(0.3); opacity: 0.9; }
+  60%  { transform: scale(1.6); opacity: 0.4; }
+  100% { transform: scale(2);   opacity: 0; }
+}
+
+/* ── Hint ─────────────────────────────────────────── */
+.hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  opacity: 0.7;
+}
+
+@media (max-height: 680px) { .gameArea { height: 320px; } }
+@media (max-width: 380px)  { .gameArea { height: 340px; } }

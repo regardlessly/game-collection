@@ -1,0 +1,95 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+  padding: var(--space-2) 0;
+}
+
+.progress {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.progress strong { color: var(--color-primary); }
+
+/* ── Clock ────────────────────────────────────────── */
+.clockWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-8);
+}
+
+.prompt {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* ── Options ──────────────────────────────────────── */
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 400px;
+}
+
+.optBtn {
+  height: 64px;
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: var(--font-base);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    transform var(--transition-fast);
+}
+.optBtn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: rgba(245,158,11,0.06);
+  transform: scale(1.02);
+}
+.optBtn:disabled { cursor: default; }
+
+.optCorrect {
+  border-color: #4ade80 !important;
+  background: rgba(74,222,128,0.12) !important;
+  color: #4ade80 !important;
+}
+.optWrong {
+  border-color: #f87171 !important;
+  background: rgba(248,113,113,0.12) !important;
+  color: #f87171 !important;
+}
+
+/* ── Feedback ─────────────────────────────────────── */
+.feedbackCorrect {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: #4ade80;
+  text-align: center;
+  min-height: 1.5em;
+}
+.feedbackWrong {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: #f87171;
+  text-align: center;
+  min-height: 1.5em;
+}
+
+@media (max-width: 360px) {
+  .optBtn { font-size: 1.2rem; height: 56px; }
+  .options { gap: var(--space-2); }
+}
