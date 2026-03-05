@@ -4,27 +4,164 @@ import { GameShell } from '../../components/GameShell/GameShell';
 import { useGameCallback } from '../../hooks/useGameCallback';
 import styles from './Blocks.module.css';
 
-// ── Board definition ────────────────────────────────────────────────
-const BOARD_CELLS = new Set([
-  '0,0','0,1','0,2','0,3','0,4',
-  '1,0','1,1','1,2','1,3','1,4',
-  '2,0','2,1','2,2','2,3','2,4',
-  '3,0','3,1','3,2','3,3','3,4','3,5',
-  '4,0','4,1','4,2','4,3','4,4',
-]);
-const BOARD_ROWS = 5;
-const BOARD_COLS = 6;
-const GAP = 4; // px — must match CSS gap
+// ── Board parsing ──────────────────────────────────────────────────
+/** Parse a compact board string like "11111.|111111" into { cells: Set, rows, cols }. */
+function parseBoard(str) {
+  const rows = str.split('|');
+  const cells = new Set();
+  const numRows = rows.length;
+  let numCols = 0;
+  for (let r = 0; r < numRows; r++) {
+    numCols = Math.max(numCols, rows[r].length);
+    for (let c = 0; c < rows[r].length; c++) {
+      if (rows[r][c] === '1') cells.add(`${r},${c}`);
+    }
+  }
+  return { cells, rows: numRows, cols: numCols };
+}
 
-// ── Piece definitions ───────────────────────────────────────────────
-const PIECE_DEFS = [
-  { id: 'blue',   color: '#3b7fd4', label: 'Blue rectangle', cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], rows: 2, cols: 3 },
-  { id: 'yellow', color: '#d4a017', label: 'Yellow L-shape',  cells: [[0,0],[0,1],[1,0],[1,1],[2,1]],       rows: 3, cols: 2 },
-  { id: 'green',  color: '#388e3c', label: 'Green square',    cells: [[0,0],[0,1],[1,0],[1,1]],             rows: 2, cols: 2 },
-  { id: 'purple', color: '#7b3fa0', label: 'Purple square',   cells: [[0,0],[0,1],[1,0],[1,1]],             rows: 2, cols: 2 },
-  { id: 'cyan',   color: '#0097a7', label: 'Cyan bar',        cells: [[0,0],[0,1],[0,2]],                   rows: 1, cols: 3 },
-  { id: 'red',    color: '#c62828', label: 'Red S-shape',     cells: [[0,1],[0,2],[1,0],[1,1]],             rows: 2, cols: 3 },
+/** Compute bounding box { rows, cols } for a set of relative cells. */
+function dims(cells) {
+  let maxR = 0, maxC = 0;
+  for (const [r, c] of cells) { maxR = Math.max(maxR, r); maxC = Math.max(maxC, c); }
+  return { rows: maxR + 1, cols: maxC + 1 };
+}
+
+// ── Colour palette ─────────────────────────────────────────────────
+const COLORS = [
+  '#3b7fd4', '#d4a017', '#388e3c', '#7b3fa0', '#0097a7',
+  '#c62828', '#e67e22', '#2e7d32', '#8e24aa', '#00838f',
 ];
+const LABELS = [
+  'Blue', 'Yellow', 'Green', 'Purple', 'Cyan',
+  'Red', 'Orange', 'Forest', 'Violet', 'Teal',
+];
+
+// ── Puzzle definitions (all verified solvable by construction) ─────
+const RAW_PUZZLES = [
+  // P0 — original 26-cell cross shape (6 pieces)
+  {
+    board: '11111.|11111.|11111.|111111|11111.',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[1,0],[1,1],[2,1]],        // L-pento
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,1],[0,2],[1,0],[1,1]],              // S-tet
+    ],
+  },
+  // P1 — 4×5 rectangle (5 pieces, 20 cells)
+  {
+    board: '11111|11111|11111|11111',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2],[0,3],[0,4]],        // 1×5 bar
+    ],
+  },
+  // P2 — 4×6 rectangle (6 pieces, 24 cells)
+  {
+    board: '111111|111111|111111|111111',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+    ],
+  },
+  // P3 — 3×6 rectangle (4 pieces, 18 cells)
+  {
+    board: '111111|111111|111111',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+    ],
+  },
+  // P4 — 5×4 rectangle (5 pieces, 20 cells)
+  {
+    board: '1111|1111|1111|1111|1111',
+    pieces: [
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2],[0,3]],              // 1×4 bar
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+    ],
+  },
+  // P5 — L-shaped board (5 pieces, 20 cells)
+  {
+    board: '11111|11111|11111|11111|1....',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2],[0,3]],              // 1×4 bar
+      [[0,0],[1,0]],                          // 1×2 vert
+    ],
+  },
+  // P6 — T-shaped board (5 pieces, 21 cells)
+  {
+    board: '.111.|.111.|.111.|11111|11111',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2],[0,3],[0,4]],        // 1×5 bar
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+    ],
+  },
+  // P7 — notched board (6 pieces, 25 cells)
+  {
+    board: '111111|111111|111111|111...|11111.',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[1,0]],                          // 1×2 vert
+    ],
+  },
+  // P8 — wide L (5 pieces, 21 cells)
+  {
+    board: '111111|111111|111111|111...',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+    ],
+  },
+  // P9 — large staircase (6 pieces, 27 cells)
+  {
+    board: '111111|111111|111111|111111|111...',
+    pieces: [
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+    ],
+  },
+];
+
+// Pre-parse all puzzles
+const PUZZLES = RAW_PUZZLES.map(raw => {
+  const board = parseBoard(raw.board);
+  const pieces = raw.pieces.map((cells, i) => ({
+    id: `p${i}`,
+    cells,
+    ...dims(cells),
+  }));
+  return { board, pieces };
+});
 
 const DIFFICULTY_CONFIG = {
   easy:   { timeLimitSeconds: null, hints: true  },
@@ -32,39 +169,51 @@ const DIFFICULTY_CONFIG = {
   hard:   { timeLimitSeconds: 300,  hints: false },
 };
 
+const GAP = 4; // px — must match CSS gap
+
 // ── Helpers ─────────────────────────────────────────────────────────
-function canPlace(pieceCells, ar, ac, placements) {
+function canPlace(boardCells, pieceCells, ar, ac, placements) {
   for (const [dr, dc] of pieceCells) {
     const key = `${ar + dr},${ac + dc}`;
-    if (!BOARD_CELLS.has(key)) return false;
+    if (!boardCells.has(key)) return false;
     if (placements[key]) return false;
   }
   return true;
 }
 
 /** Try all snap positions so any piece-cell can land at (r, c). */
-function findValidAnchor(piece, r, c, placements) {
+function findValidAnchor(boardCells, piece, r, c, placements) {
   const candidates = [[r, c], ...piece.cells.map(([dr, dc]) => [r - dr, c - dc])];
   const seen = new Set();
   for (const [ar, ac] of candidates) {
     const k = `${ar},${ac}`;
     if (seen.has(k)) continue;
     seen.add(k);
-    if (canPlace(piece.cells, ar, ac, placements)) return [ar, ac];
+    if (canPlace(boardCells, piece.cells, ar, ac, placements)) return [ar, ac];
   }
   return null;
 }
 
 /** Convert a client-coordinate point into board [row, col]. */
-function clientToCell(boardEl, clientX, clientY) {
+function clientToCell(boardEl, clientX, clientY, boardRows, boardCols) {
   if (!boardEl) return null;
   const rect = boardEl.getBoundingClientRect();
-  const cellW = (rect.width  - (BOARD_COLS - 1) * GAP) / BOARD_COLS;
-  const cellH = (rect.height - (BOARD_ROWS - 1) * GAP) / BOARD_ROWS;
+  const cellW = (rect.width  - (boardCols - 1) * GAP) / boardCols;
+  const cellH = (rect.height - (boardRows - 1) * GAP) / boardRows;
   const c = Math.floor((clientX - rect.left) / (cellW + GAP));
   const r = Math.floor((clientY - rect.top)  / (cellH + GAP));
-  if (r < 0 || r >= BOARD_ROWS || c < 0 || c >= BOARD_COLS) return null;
+  if (r < 0 || r >= boardRows || c < 0 || c >= boardCols) return null;
   return [r, c];
+}
+
+/** Fisher-Yates shuffle (returns new array). */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 // ── Piece preview (mini grid) ───────────────────────────────────────
@@ -99,6 +248,23 @@ PiecePreview.propTypes = { piece: PropTypes.object.isRequired, cellSize: PropTyp
 function BlocksGame({ difficulty, onComplete, reportScore }) {
   const { hints } = DIFFICULTY_CONFIG[difficulty] ?? DIFFICULTY_CONFIG.easy;
 
+  // Pick a random puzzle on mount, assign shuffled colors
+  const puzzle = useMemo(() => {
+    const idx = Math.floor(Math.random() * PUZZLES.length);
+    const { board, pieces } = PUZZLES[idx];
+    const colorOrder = shuffle(COLORS.slice(0, Math.max(pieces.length, COLORS.length)));
+    const labelOrder = shuffle(LABELS.slice(0, Math.max(pieces.length, LABELS.length)));
+    const trayOrder = shuffle(pieces.map((p, i) => i));
+    const coloredPieces = pieces.map((p, i) => ({
+      ...p,
+      color: colorOrder[i % colorOrder.length],
+      label: `${labelOrder[i % labelOrder.length]} piece`,
+    }));
+    return { board, pieces: coloredPieces, trayOrder };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const { board, pieces: pieceDefs, trayOrder } = puzzle;
+
   const [placements,  setPlacements]  = useState({});
   const [placed,      setPlaced]      = useState(new Set());
   const [selectedId,  setSelectedId]  = useState(null);
@@ -122,33 +288,33 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
 
   // Win detection
   useEffect(() => {
-    if (placed.size === PIECE_DEFS.length && !done) {
+    if (placed.size === pieceDefs.length && !done) {
       setDone(true);
-      onComplete({ finalScore: PIECE_DEFS.length, maxScore: PIECE_DEFS.length, completed: true });
+      onComplete({ finalScore: pieceDefs.length, maxScore: pieceDefs.length, completed: true });
     }
-  }, [placed.size, done, onComplete]);
+  }, [placed.size, done, onComplete, pieceDefs.length]);
 
   // Hint cells (easy mode)
   const hintCells = useMemo(() => {
     if (!hints || !selectedId) return new Set();
-    const piece = PIECE_DEFS.find(p => p.id === selectedId);
+    const piece = pieceDefs.find(p => p.id === selectedId);
     if (!piece) return new Set();
     const result = new Set();
-    for (let ar = 0; ar < BOARD_ROWS; ar++) {
-      for (let ac = 0; ac < BOARD_COLS; ac++) {
-        if (canPlace(piece.cells, ar, ac, placements)) {
+    for (let ar = 0; ar < board.rows; ar++) {
+      for (let ac = 0; ac < board.cols; ac++) {
+        if (canPlace(board.cells, piece.cells, ar, ac, placements)) {
           for (const [dr, dc] of piece.cells) result.add(`${ar + dr},${ac + dc}`);
         }
       }
     }
     return result;
-  }, [hints, selectedId, placements]);
+  }, [hints, selectedId, placements, pieceDefs, board]);
 
   // ── Place a piece ───────────────────────────────────────────────
   const placePiece = useCallback((pieceId, r, c) => {
-    const piece = PIECE_DEFS.find(p => p.id === pieceId);
+    const piece = pieceDefs.find(p => p.id === pieceId);
     if (!piece) return false;
-    const anchor = findValidAnchor(piece, r, c, placements);
+    const anchor = findValidAnchor(board.cells, piece, r, c, placements);
     if (!anchor) return false;
     const [ar, ac] = anchor;
     const next = { ...placements };
@@ -157,7 +323,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     setPlaced(prev => new Set([...prev, pieceId]));
     setSelectedId(null);
     return true;
-  }, [placements]);
+  }, [placements, pieceDefs, board.cells]);
 
   // ── Remove a piece from board ───────────────────────────────────
   const removePiece = useCallback((pieceId) => {
@@ -189,7 +355,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
   }, []);
 
   const handleCellTap = useCallback((r, c) => {
-    // If a piece is selected, try to place it
     if (selectedId) {
       if (!placePiece(selectedId, r, c)) {
         setInvalidKey(`${r},${c}`);
@@ -197,7 +362,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
       }
       return;
     }
-    // If tapping a filled cell, remove that piece
     const pieceId = placements[`${r},${c}`];
     if (pieceId) removePiece(pieceId);
   }, [selectedId, placements, placePiece, removePiece]);
@@ -205,12 +369,11 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
   // ── Drag handlers (pointer events) ──────────────────────────────
   const handleDragStart = useCallback((e, pieceId) => {
     if (placed.has(pieceId)) return;
-    e.target.releasePointerCapture(e.pointerId); // let events flow freely
+    e.target.releasePointerCapture(e.pointerId);
     setDragging({ pieceId, ghostX: e.clientX, ghostY: e.clientY });
     setSelectedId(null);
   }, [placed]);
 
-  // Attach pointermove/pointerup on window during drag
   useEffect(() => {
     if (!dragging) return;
     function onMove(e) {
@@ -219,7 +382,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     function onUp(e) {
       setDragging(prev => {
         if (!prev) return null;
-        const cell = clientToCell(boardRef.current, e.clientX, e.clientY);
+        const cell = clientToCell(boardRef.current, e.clientX, e.clientY, board.rows, board.cols);
         if (cell) placePiece(prev.pieceId, cell[0], cell[1]);
         return null;
       });
@@ -230,7 +393,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup',   onUp);
     };
-  }, [dragging, placePiece]);
+  }, [dragging, placePiece, board.rows, board.cols]);
 
   // Prevent touch scrolling during drag
   useEffect(() => {
@@ -240,8 +403,8 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     return () => document.removeEventListener('touchmove', prevent);
   }, [dragging]);
 
-  const selectedPiece = PIECE_DEFS.find(p => p.id === selectedId);
-  const draggingPiece = dragging ? PIECE_DEFS.find(p => p.id === dragging.pieceId) : null;
+  const selectedPiece = pieceDefs.find(p => p.id === selectedId);
+  const draggingPiece = dragging ? pieceDefs.find(p => p.id === dragging.pieceId) : null;
   const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
   return (
@@ -250,23 +413,23 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
       <div className={styles.timerRow} aria-live="off" role="timer">
         <span className={styles.timerLabel}>Time</span>
         <span className={styles.timerValue}>{fmt(elapsed)}</span>
-        <span className={styles.progress}>{placed.size}/{PIECE_DEFS.length} pieces</span>
+        <span className={styles.progress}>{placed.size}/{pieceDefs.length} pieces</span>
       </div>
 
       {/* Board */}
       <div
         ref={boardRef}
         className={styles.board}
-        style={{ gridTemplateColumns: `repeat(${BOARD_COLS}, var(--cell))` }}
+        style={{ gridTemplateColumns: `repeat(${board.cols}, var(--cell))` }}
         role="grid"
         aria-label="Puzzle board"
       >
-        {Array.from({ length: BOARD_ROWS }, (_, r) =>
-          Array.from({ length: BOARD_COLS }, (_, c) => {
+        {Array.from({ length: board.rows }, (_, r) =>
+          Array.from({ length: board.cols }, (_, c) => {
             const key     = `${r},${c}`;
-            const isBoard = BOARD_CELLS.has(key);
+            const isBoard = board.cells.has(key);
             const pieceId = placements[key];
-            const piece   = pieceId ? PIECE_DEFS.find(p => p.id === pieceId) : null;
+            const piece   = pieceId ? pieceDefs.find(p => p.id === pieceId) : null;
             const isHint  = hintCells.has(key);
             const isInv   = invalidKey === key;
             const canTap  = isBoard && (!!selectedId && !pieceId || pieceId);
@@ -308,7 +471,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
           </>
         ) : (
           <span className={styles.hintText}>
-            {placed.size === PIECE_DEFS.length
+            {placed.size === pieceDefs.length
               ? 'All pieces placed!'
               : dragging ? 'Drop on the board…' : 'Tap or drag a piece. Tap a placed piece to remove it.'}
           </span>
@@ -318,9 +481,10 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
         )}
       </div>
 
-      {/* Piece tray */}
+      {/* Piece tray — shuffled order */}
       <div className={styles.tray} role="list" aria-label="Pieces to place">
-        {PIECE_DEFS.map(piece => {
+        {trayOrder.map(i => {
+          const piece = pieceDefs[i];
           const isPlaced   = placed.has(piece.id);
           const isSelected = selectedId === piece.id;
           const isDragging = dragging?.pieceId === piece.id;
@@ -346,7 +510,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
         })}
       </div>
 
-      {/* Drag ghost */}
+      {/* Drag ghost — aligned to top-left of cursor */}
       {draggingPiece && dragging && (
         <div
           className={styles.ghost}

@@ -233,7 +233,6 @@
   position: fixed;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
   opacity: 0.85;
   filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.30));
 }
