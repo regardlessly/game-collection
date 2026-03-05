@@ -25,6 +25,7 @@ import { CurrencyQuiz }     from './games/CurrencyQuiz/CurrencyQuiz';
 import { LandmarkQuiz }     from './games/LandmarkQuiz/LandmarkQuiz';
 import { SnakeLite }        from './games/SnakeLite/SnakeLite';
 import { TileFlip }         from './games/TileFlip/TileFlip';
+import { Blocks }           from './games/Blocks/Blocks';
 import { useMusic }         from './hooks/useMusic';
 import './design/globals.css';
 import styles from './App.module.css';
@@ -58,6 +59,7 @@ const GAME_MAP = {
   'landmark-quiz':     LandmarkQuiz,
   'snake-lite':        SnakeLite,
   'tile-flip':         TileFlip,
+  'blocks':            Blocks,
 };
 
 // Games grouped by cognitive category
@@ -122,6 +124,7 @@ const GAME_GROUPS = [
     games: [
       { id: 'snake-lite', title: 'Snake',     icon: '🐍', domain: 'Coordination', description: 'Guide the snake to eat fruit. Don\'t hit the walls or yourself!' },
       { id: 'tile-flip',  title: 'Tile Flip', icon: '🟨', domain: 'Spatial Memory', description: 'Memorise which tiles light up, then tap them all from memory.' },
+      { id: 'blocks',     title: 'Blocks',    icon: '🧩', domain: 'Spatial Reasoning', description: 'Fit all the coloured blocks into the puzzle board.' },
     ],
   },
 ];

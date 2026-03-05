@@ -1,0 +1,15 @@
+name: caritahub_games
+description: CaritaHub Cognitive Games — 26 brain-training exercises for seniors.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webview_flutter: ^4.10.0
+
+flutter:
+  uses-material-design: true
