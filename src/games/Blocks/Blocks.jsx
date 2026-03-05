@@ -5,7 +5,6 @@ import { useGameCallback } from '../../hooks/useGameCallback';
 import styles from './Blocks.module.css';
 
 // ── Board parsing ──────────────────────────────────────────────────
-/** Parse a compact board string like "11111.|111111" into { cells: Set, rows, cols }. */
 function parseBoard(str) {
   const rows = str.split('|');
   const cells = new Set();
@@ -20,7 +19,6 @@ function parseBoard(str) {
   return { cells, rows: numRows, cols: numCols };
 }
 
-/** Compute bounding box { rows, cols } for a set of relative cells. */
 function dims(cells) {
   let maxR = 0, maxC = 0;
   for (const [r, c] of cells) { maxR = Math.max(maxR, r); maxC = Math.max(maxC, c); }
@@ -37,117 +35,116 @@ const LABELS = [
   'Red', 'Orange', 'Forest', 'Violet', 'Teal',
 ];
 
-// ── Puzzle definitions (all verified solvable by construction) ─────
+// ── Puzzle definitions (all built by placing pieces first → board derived) ──
+// Each piece has `cells` (relative offsets) and `solution` [anchorRow, anchorCol].
 const RAW_PUZZLES = [
-  // P0 — original 26-cell cross shape (6 pieces)
-  {
-    board: '11111.|11111.|11111.|111111|11111.',
-    pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[1,0],[1,1],[2,1]],        // L-pento
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,1],[0,2],[1,0],[1,1]],              // S-tet
-    ],
-  },
-  // P1 — 4×5 rectangle (5 pieces, 20 cells)
+  // P0 — 4×5 rectangle (20 cells, 5 pieces)
   {
     board: '11111|11111|11111|11111',
     pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2],[0,3],[0,4]],        // 1×5 bar
+      { cells: [[0,0],[0,1],[1,0],[1,1]],                         solution: [0,0] }, // 2×2
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]],             solution: [0,2] }, // 2×3
+      { cells: [[0,0],[0,1],[1,0],[1,1]],                         solution: [2,0] }, // 2×2
+      { cells: [[0,0],[0,1],[1,0],[1,1]],                         solution: [2,2] }, // 2×2
+      { cells: [[0,0],[1,0]],                                     solution: [2,4] }, // 2×1 vert
     ],
   },
-  // P2 — 4×6 rectangle (6 pieces, 24 cells)
+  // P1 — 4×6 rectangle (24 cells, 4 pieces)
   {
     board: '111111|111111|111111|111111',
     pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,0] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,3] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [2,0] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [2,3] },
     ],
   },
-  // P3 — 3×6 rectangle (4 pieces, 18 cells)
+  // P2 — 3×6 rectangle (18 cells, 6 pieces)
   {
     board: '111111|111111|111111',
     pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [0,0] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [0,2] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [0,4] },
+      { cells: [[0,0],[0,1]],             solution: [2,0] },
+      { cells: [[0,0],[0,1]],             solution: [2,2] },
+      { cells: [[0,0],[0,1]],             solution: [2,4] },
     ],
   },
-  // P4 — 5×4 rectangle (5 pieces, 20 cells)
+  // P3 — 5×4 rectangle (20 cells, 5 pieces)
   {
     board: '1111|1111|1111|1111|1111',
     pieces: [
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2],[0,3]],              // 1×4 bar
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [0,0] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [0,2] },
+      { cells: [[0,0],[0,1],[0,2],[0,3]],             solution: [2,0] }, // 1×4 bar
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [3,0] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [3,2] },
     ],
   },
-  // P5 — L-shaped board (5 pieces, 20 cells)
-  {
-    board: '11111|11111|11111|11111|1....',
-    pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2],[0,3]],              // 1×4 bar
-      [[0,0],[1,0]],                          // 1×2 vert
-    ],
-  },
-  // P6 — T-shaped board (5 pieces, 21 cells)
-  {
-    board: '.111.|.111.|.111.|11111|11111',
-    pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2],[0,3],[0,4]],        // 1×5 bar
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-    ],
-  },
-  // P7 — notched board (6 pieces, 25 cells)
-  {
-    board: '111111|111111|111111|111...|11111.',
-    pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[1,0]],                          // 1×2 vert
-    ],
-  },
-  // P8 — wide L (5 pieces, 21 cells)
+  // P4 — L-shape (21 cells, 4 pieces)
   {
     board: '111111|111111|111111|111...',
     pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,0] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,3] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [2,0] },
+      { cells: [[0,0],[0,1],[0,2]],                   solution: [2,3] }, // 1×3 bar
     ],
   },
-  // P9 — large staircase (6 pieces, 27 cells)
+  // P5 — irregular with S-tetromino (21 cells, 5 pieces)
+  // AABBB | AACCC | DDDCC | DD.EE | ...EE
+  {
+    board: '11111|11111|1111.|1111.|.111.',
+    pieces: [
+      { cells: [[0,0],[0,1],[1,0],[1,1]],                         solution: [0,0] }, // 2×2
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]],             solution: [0,2] }, // 2×3
+      { cells: [[0,0],[1,0],[1,1],[2,1]],                         solution: [2,0] }, // S-tet
+      { cells: [[0,0],[0,1],[0,2]],                               solution: [2,1] }, // 1×3 bar
+      { cells: [[0,0],[0,1],[1,0],[1,1]],                         solution: [3,3] }, // 2×2
+    ],
+  },
+  // P6 — 4×4 square (16 cells, 4 pieces)
+  {
+    board: '1111|1111|1111|1111',
+    pieces: [
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [0,0] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [0,2] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [2,0] },
+      { cells: [[0,0],[0,1],[1,0],[1,1]], solution: [2,2] },
+    ],
+  },
+  // P7 — 3×5 rectangle (15 cells, 4 pieces)
+  {
+    board: '11111|11111|11111',
+    pieces: [
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [0,0] }, // 2×2
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,2] }, // 2×3
+      { cells: [[0,0],[0,1],[0,2]],                   solution: [2,0] }, // 1×3
+      { cells: [[0,0],[0,1]],                         solution: [2,3] }, // 1×2
+    ],
+  },
+  // P8 — with T-tetromino (18 cells, 4 pieces)
+  // AAABB | AAABB | CCCDD | .C.DD
+  {
+    board: '11111|11111|11111|.1.11',
+    pieces: [
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,0] }, // 2×3
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [0,3] }, // 2×2
+      { cells: [[0,0],[0,1],[0,2],[1,1]],             solution: [2,0] }, // T-tet
+      { cells: [[0,0],[0,1],[1,0],[1,1]],             solution: [2,3] }, // 2×2
+    ],
+  },
+  // P9 — 5×6 with bite (27 cells, 6 pieces)
   {
     board: '111111|111111|111111|111111|111...',
     pieces: [
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], // 2×3 rect
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
-      [[0,0],[0,1],[0,2]],                    // 1×3 bar
-      [[0,0],[0,1],[1,0],[1,1]],              // 2×2
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,0] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [0,3] },
+      { cells: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2]], solution: [2,0] },
+      { cells: [[0,0],[0,1],[0,2]],                   solution: [2,3] },
+      { cells: [[0,0],[0,1],[0,2]],                   solution: [3,3] },
+      { cells: [[0,0],[0,1],[0,2]],                   solution: [4,0] },
     ],
   },
 ];
@@ -155,10 +152,11 @@ const RAW_PUZZLES = [
 // Pre-parse all puzzles
 const PUZZLES = RAW_PUZZLES.map(raw => {
   const board = parseBoard(raw.board);
-  const pieces = raw.pieces.map((cells, i) => ({
+  const pieces = raw.pieces.map((p, i) => ({
     id: `p${i}`,
-    cells,
-    ...dims(cells),
+    cells: p.cells,
+    solution: p.solution,
+    ...dims(p.cells),
   }));
   return { board, pieces };
 });
@@ -169,7 +167,7 @@ const DIFFICULTY_CONFIG = {
   hard:   { timeLimitSeconds: 300,  hints: false },
 };
 
-const GAP = 4; // px — must match CSS gap
+const GAP = 4;
 
 // ── Helpers ─────────────────────────────────────────────────────────
 function canPlace(boardCells, pieceCells, ar, ac, placements) {
@@ -181,7 +179,6 @@ function canPlace(boardCells, pieceCells, ar, ac, placements) {
   return true;
 }
 
-/** Try all snap positions so any piece-cell can land at (r, c). */
 function findValidAnchor(boardCells, piece, r, c, placements) {
   const candidates = [[r, c], ...piece.cells.map(([dr, dc]) => [r - dr, c - dc])];
   const seen = new Set();
@@ -194,7 +191,6 @@ function findValidAnchor(boardCells, piece, r, c, placements) {
   return null;
 }
 
-/** Convert a client-coordinate point into board [row, col]. */
 function clientToCell(boardEl, clientX, clientY, boardRows, boardCols) {
   if (!boardEl) return null;
   const rect = boardEl.getBoundingClientRect();
@@ -206,7 +202,6 @@ function clientToCell(boardEl, clientX, clientY, boardRows, boardCols) {
   return [r, c];
 }
 
-/** Fisher-Yates shuffle (returns new array). */
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -252,9 +247,9 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
   const puzzle = useMemo(() => {
     const idx = Math.floor(Math.random() * PUZZLES.length);
     const { board, pieces } = PUZZLES[idx];
-    const colorOrder = shuffle(COLORS.slice(0, Math.max(pieces.length, COLORS.length)));
-    const labelOrder = shuffle(LABELS.slice(0, Math.max(pieces.length, LABELS.length)));
-    const trayOrder = shuffle(pieces.map((p, i) => i));
+    const colorOrder = shuffle(COLORS);
+    const labelOrder = shuffle(LABELS);
+    const trayOrder = shuffle(pieces.map((_, i) => i));
     const coloredPieces = pieces.map((p, i) => ({
       ...p,
       color: colorOrder[i % colorOrder.length],
@@ -271,9 +266,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
   const [invalidKey,  setInvalidKey]  = useState(null);
   const [elapsed,     setElapsed]     = useState(0);
   const [done,        setDone]        = useState(false);
-
-  // Drag state
-  const [dragging, setDragging] = useState(null); // { pieceId, ghostX, ghostY }
+  const [dragging, setDragging] = useState(null);
   const boardRef = useRef(null);
 
   // Count-up timer
@@ -283,7 +276,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     return () => clearInterval(t);
   }, [done]);
 
-  // Push progress to HUD
   useEffect(() => { reportScore(placed.size); }, [placed.size, reportScore]);
 
   // Win detection
@@ -310,7 +302,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     return result;
   }, [hints, selectedId, placements, pieceDefs, board]);
 
-  // ── Place a piece ───────────────────────────────────────────────
   const placePiece = useCallback((pieceId, r, c) => {
     const piece = pieceDefs.find(p => p.id === pieceId);
     if (!piece) return false;
@@ -325,7 +316,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     return true;
   }, [placements, pieceDefs, board.cells]);
 
-  // ── Remove a piece from board ───────────────────────────────────
   const removePiece = useCallback((pieceId) => {
     setPlacements(prev => {
       const next = {};
@@ -341,14 +331,26 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     });
   }, []);
 
-  // ── Clear all ───────────────────────────────────────────────────
   const clearAll = useCallback(() => {
     setPlacements({});
     setPlaced(new Set());
     setSelectedId(null);
   }, []);
 
-  // ── Tap handlers ────────────────────────────────────────────────
+  // ── Solve ─────────────────────────────────────────────────────────
+  const handleSolve = useCallback(() => {
+    const next = {};
+    for (const piece of pieceDefs) {
+      const [ar, ac] = piece.solution;
+      for (const [dr, dc] of piece.cells) {
+        next[`${ar + dr},${ac + dc}`] = piece.id;
+      }
+    }
+    setPlacements(next);
+    setPlaced(new Set(pieceDefs.map(p => p.id)));
+    setSelectedId(null);
+  }, [pieceDefs]);
+
   const handlePieceSelect = useCallback((id) => {
     setSelectedId(prev => prev === id ? null : id);
     setInvalidKey(null);
@@ -366,7 +368,7 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     if (pieceId) removePiece(pieceId);
   }, [selectedId, placements, placePiece, removePiece]);
 
-  // ── Drag handlers (pointer events) ──────────────────────────────
+  // ── Drag handlers ─────────────────────────────────────────────────
   const handleDragStart = useCallback((e, pieceId) => {
     if (placed.has(pieceId)) return;
     e.target.releasePointerCapture(e.pointerId);
@@ -395,7 +397,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
     };
   }, [dragging, placePiece, board.rows, board.cols]);
 
-  // Prevent touch scrolling during drag
   useEffect(() => {
     if (!dragging) return;
     function prevent(e) { e.preventDefault(); }
@@ -409,14 +410,12 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
 
   return (
     <div className={styles.gameWrapper}>
-      {/* Elapsed timer */}
       <div className={styles.timerRow} aria-live="off" role="timer">
         <span className={styles.timerLabel}>Time</span>
         <span className={styles.timerValue}>{fmt(elapsed)}</span>
         <span className={styles.progress}>{placed.size}/{pieceDefs.length} pieces</span>
       </div>
 
-      {/* Board */}
       <div
         ref={boardRef}
         className={styles.board}
@@ -459,7 +458,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
         )}
       </div>
 
-      {/* Status hint */}
       <div className={styles.statusRow}>
         {selectedPiece ? (
           <>
@@ -476,12 +474,16 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
               : dragging ? 'Drop on the board…' : 'Tap or drag a piece. Tap a placed piece to remove it.'}
           </span>
         )}
-        {placed.size > 0 && !done && (
-          <button className={styles.clearAllBtn} onClick={clearAll}>Clear all</button>
+        {!done && (
+          <div className={styles.actionBtns}>
+            {placed.size > 0 && (
+              <button className={styles.clearAllBtn} onClick={clearAll}>Clear all</button>
+            )}
+            <button className={styles.solveBtn} onClick={handleSolve}>Solve</button>
+          </div>
         )}
       </div>
 
-      {/* Piece tray — shuffled order */}
       <div className={styles.tray} role="list" aria-label="Pieces to place">
         {trayOrder.map(i => {
           const piece = pieceDefs[i];
@@ -510,7 +512,6 @@ function BlocksGame({ difficulty, onComplete, reportScore }) {
         })}
       </div>
 
-      {/* Drag ghost — aligned to top-left of cursor */}
       {draggingPiece && dragging && (
         <div
           className={styles.ghost}

@@ -159,6 +159,26 @@
   background: #ffebee;
 }
 
+.actionBtns {
+  display: flex;
+  gap: 6px;
+}
+
+.solveBtn {
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid #90caf9;
+  background: #e3f2fd;
+  cursor: pointer;
+  color: #1565c0;
+  transition: background 0.12s;
+}
+
+.solveBtn:hover {
+  background: #bbdefb;
+}
+
 /* ── Piece tray ──────────────────────────────────────────────────── */
 .tray {
   display: flex;
