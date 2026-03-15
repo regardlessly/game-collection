@@ -1,0 +1,94 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:   # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  build-apk:
+    name: Build release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout repo ─────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Java (required by Android build tools) ─────
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # ── 3. Set up Flutter ─────────────────────────────────────
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4'
+          channel: 'stable'
+          cache: true
+
+      # ── 4. Create base Flutter project ────────────────────────
+      #    We scaffold a fresh project so Flutter generates the
+      #    android/ boilerplate, then overlay our custom source.
+      - name: Scaffold Flutter project
+        run: |
+          flutter create \
+            --project-name caritahub_games \
+            --org com.caritahub \
+            --platforms android \
+            /tmp/caritahub_games
+
+      # ── 5. Overlay our app source ─────────────────────────────
+      - name: Copy app source files
+        run: |
+          cp flutter_app/pubspec.yaml /tmp/caritahub_games/pubspec.yaml
+          cp flutter_app/lib/main.dart /tmp/caritahub_games/lib/main.dart
+
+      # ── 6. Update AndroidManifest with INTERNET permission ────
+      - name: Patch AndroidManifest.xml
+        run: |
+          MANIFEST=/tmp/caritahub_games/android/app/src/main/AndroidManifest.xml
+          # Add INTERNET permission if not already present
+          if ! grep -q 'INTERNET' "$MANIFEST"; then
+            sed -i 's|<manifest|<manifest\n    xmlns:android="http://schemas.android.com/apk/res/android"|' "$MANIFEST" 2>/dev/null || true
+            sed -i 's|<application|<uses-permission android:name="android.permission.INTERNET"/>\n    <application|' "$MANIFEST"
+          fi
+          echo "--- AndroidManifest.xml ---"
+          cat "$MANIFEST"
+
+      # ── 7. Install Dart dependencies ──────────────────────────
+      - name: flutter pub get
+        working-directory: /tmp/caritahub_games
+        run: flutter pub get
+
+      # ── 8. Build release APK ──────────────────────────────────
+      - name: Build release APK
+        working-directory: /tmp/caritahub_games
+        run: flutter build apk --release
+
+      # ── 9. Upload APK as downloadable artifact ────────────────
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: caritahub-games-apk
+          path: /tmp/caritahub_games/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      # ── 10. Print download instructions ───────────────────────
+      - name: Print download info
+        run: |
+          echo ""
+          echo "✅ APK built successfully!"
+          echo ""
+          echo "To download:"
+          echo "  1. Go to: https://github.com/${{ github.repository }}/actions"
+          echo "  2. Click the latest 'Build Android APK' run"
+          echo "  3. Download the 'caritahub-games-apk' artifact"
+          echo ""
