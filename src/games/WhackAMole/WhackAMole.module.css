@@ -2,10 +2,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: var(--space-4);
   width: 100%;
   user-select: none;
   -webkit-user-select: none;
+  flex: 1;
 }
 
 .statusRow {

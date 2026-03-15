@@ -6,6 +6,7 @@
   width: 100%;
   user-select: none;
   -webkit-user-select: none;
+  flex: 1;
 }
 
 /* ── Status row ───────────────────────────────────── */
@@ -44,6 +45,7 @@
   gap: var(--space-2);
   width: 100%;
   max-width: 560px;
+  flex: 1;
 }
 
 /* ── Side buttons (outside game area — no touch conflicts) ── */
@@ -78,7 +80,7 @@
 .gameArea {
   position: relative;
   flex: 1;
-  height: 420px;
+  min-height: 300px;
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
   overflow: hidden;
@@ -142,9 +144,9 @@
 
 /* ── Responsive ───────────────────────────────────── */
 @media (max-height: 680px) {
-  .gameArea { height: 320px; }
+  .gameArea { min-height: 280px; }
 }
 @media (max-width: 380px) {
   .sideBtn { width: 44px; font-size: 1.5rem; }
-  .gameArea { height: 340px; }
+  .gameArea { min-height: 280px; }
 }
